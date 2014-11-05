@@ -22,7 +22,7 @@
 #include <time.h>
 
 // Global version string
-char version[7] = "v0.1";
+char version[7] = "v0.2";
 
 /* Function prototypes start */
 void printCopyright();
@@ -34,18 +34,18 @@ void printWarranty();
 int main(int argc, char **argv) {
 	// If inappropriate number of arguments
 	if(argc < 2 || argc > 3) { // If inappropriate number of arguments (number required = 2)
-		printf("Inappropriate amount of arguments.");
+		printf("Inappropriate amount of arguments.\n");
 		printf("Usage: %s [num_trials]\n", argv[0]);
 		return 1;
 	}
 
-	if(strcmp(argv[1], "-c") == 0) { // If argv[1] (the second argument) is equal to "-c" ...
+	if(!strcmp(argv[1], "-c")) { // If argv[1] (the second argument) is equal to "-c" ...
 		printAllCopyright();
 		return 0;
-	} else if(strcmp(argv[1], "-w") == 0) { // If argv[1] is equal to "-w"
+	} else if(!strcmp(argv[1], "-w")) { // If argv[1] is equal to "-w"
 		printWarranty();
 		return 0;
-	} else if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) { // If argv[1] is equal to "-h" or "--help"
+	} else if(!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) { // If argv[1] is equal to "-h" or "--help"
 		printf("Usage: %s [num_trials]\n\
  -c		-- Print copyright info\n\
  -h | --help	-- Print this help information\n\
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 	} else {
 		int i = 0;
 		while(argv[1][i] != '\0') { // While argv[1][i] is not equal to NULL (can't use NULL for pointers)
-			if(isdigit(argv[1][i] - '0') != 0) { // if argv[1][i] is not a number between 0 and 9
+			if(isdigit(argv[1][i] - '0')) { // if argv[1][i] is not a number between 0 and 9
 				printf("You did not specify a number.\n");
 				printf("Usage: %s [num_trials]\n", argv[0]);
 				return 1;
@@ -65,24 +65,32 @@ int main(int argc, char **argv) {
 
 	printCopyright();
 
-	int trials = atoi(argv[1]);
-	int heads = 0;
-	int tails = 0;
+	long long int trials = atoi(argv[1]);
+	long long int heads = 0;
+	long long int tails = 0;
 
 	// Setup the random number generator with the seed being the time
 	srand(time(NULL));
 
+	long long int oldprogress = 0;
+
 	printf("Calculating random numbers...\n");
-	for(int i = 0; i < trials; i++) {
-		if(i % 100000000 == 0) printf("Working...\n");
+	printf("Progress: 0 %%\n");
+	for(long long int i = 0; i < trials; i++) {
+		long long int progress = (i * 100) / trials;
+		if(progress != oldprogress && progress % 10 == 0) {
+			printf("Progress: %lli %%\n", progress);
+			oldprogress = progress;
+		}
 		int r = rand() % 100 + 1; // Calculate random number between 1 and 100
 		if(r <= 50) heads++;
 		else tails++;
 	}
+	printf("Progress: 100 %%\n");
 
-	printf("Done.\n");
-	printf("Heads: %i\n", heads);
-	printf("Tails: %i\n", tails);
+	printf("Done.\n\n");
+	printf("Heads: %lli\n", heads);
+	printf("Tails: %lli\n", tails);
 	return 0;
 }
 
@@ -112,7 +120,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
 void printWarranty() {
 	printf("  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n\
 APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n\
-HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS\" IS WITHOUT WARRANTY\n\
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n\
 OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,\n\
 THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n\
 PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM\n\
